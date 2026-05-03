@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VideoLaris AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #ccc;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #22c55e;
+      color: white;
+      font-size: 16px;
+    }
+
+    video {
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 10px;
+    }
+
+    .mode button {
+      width: 30%;
+      margin: 5px;
+      background: #1e293b;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎥 VideoLaris AI</h1>
+<p>Bikin video jualan otomatis dalam 1 klik</p>
+
+<div class="mode">
+  <button onclick="setMode('ads')">🛍️ Jualan</button>
+  <button onclick="setMode('cinematic')">🎬 Cinematic</button>
+  <button onclick="setMode('viral')">🔥 Viral</button>
+</div>
+
+<input id="prompt" placeholder="Contoh: produk skincare glowing..." />
+
+<button onclick="generate()">🚀 Buat Video</button>
+
+<p id="status"></p>
+
+<video id="video" controls></video>
+
+</div>
+
+<script>
+let mode = "ads";
+
+function setMode(m) {
+  mode = m;
+}
+
+async function generate() {
+  const prompt = document.getElementById("prompt").value;
+
+  document.getElementById("status").innerText = "Mengirim request...";
+
+  const res = await fetch("/api/generate", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ prompt, mode })
+  });
+
+  const data = await res.json();
+
+  checkStatus(data.job_id);
+}
+
+function checkStatus(jobId) {
+  document.getElementById("status").innerText = "Memproses video...";
+
+  const interval = setInterval(async () => {
+    const res = await fetch(`/api/status?job_id=${jobId}`);
+    const data = await res.json();
+
+    if (data.status === "completed") {
+      clearInterval(interval);
+      document.getElementById("video").src = data.video_url;
+      document.getElementById("status").innerText = "Selesai!";
+    }
+
+    if (data.status === "failed") {
+      clearInterval(interval);
+      document.getElementById("status").innerText = "Gagal!";
+    }
+  }, 3000);
+}
+</script>
