@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VideoLaris AI</title>
+</head>
+<body>
+
+<h1>AI Video Generator</h1>
+
+<input id="prompt" placeholder="Contoh: produk kopi estetik" />
+<button onclick="generate()">Buat Video</button>
+
+<p id="status"></p>
+<video id="video" controls width="300"></video>
+
+<script>
+async function generate() {
+  document.getElementById("status").innerText = "Memproses...";
+
+  setTimeout(() => {
+    document.getElementById("video").src =
+      "https://www.w3schools.com/html/mov_bbb.mp4";
+    document.getElementById("status").innerText = "Selesai!";
+  }, 2000);
+}
+</script>
+
+</body>
+</html>
